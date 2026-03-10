@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { FiHome, FiGrid, FiMenu, FiX } from 'react-icons/fi'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { FiHome, FiGrid, FiMenu, FiX, FiLogOut } from 'react-icons/fi'
+import { getCurrentUser, logout } from '../services/auth'
 
 type NavItem = {
   path: string
@@ -20,6 +21,13 @@ type Props = {
 const Layout = ({ children }: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
+  const user = getCurrentUser()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -47,9 +55,23 @@ const Layout = ({ children }: Props) => {
                 </h1>
               </Link>
             </div>
-            <div className="flex items-center gap-3 bg-white/5 rounded-full px-3 py-1.5 border border-white/10">
-              <span className="text-xs font-medium text-slate-400 hidden sm:inline">Hospital Platform</span>
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden />
+            <div className="flex items-center gap-3">
+              {user && (
+                <div className="flex items-center gap-2 bg-white/5 rounded-full px-3 py-1.5 border border-white/10">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden />
+                  <span className="text-xs font-medium text-slate-300 hidden sm:inline">{user.fullName}</span>
+                </div>
+              )}
+              {user && (
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1.5 text-slate-400 hover:text-red-400 hover:bg-red-400/10 px-3 py-1.5 rounded-lg transition-all duration-200 text-sm"
+                  aria-label="Chiqish"
+                >
+                  <FiLogOut />
+                  <span className="hidden sm:inline text-xs">Chiqish</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
