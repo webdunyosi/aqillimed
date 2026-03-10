@@ -18,9 +18,9 @@ const Login = () => {
       return
     }
 
-    if (user.role === 'admin') navigate('/admin-dashboard')
-    else if (user.role === 'doctor') navigate('/doctor-dashboard')
-    else navigate('/user-dashboard')
+    if (user.role === 'admin') navigate('/admin')
+    else if (user.role === 'doctor') navigate('/doctor')
+    else navigate('/patient')
   }
 
   return (
