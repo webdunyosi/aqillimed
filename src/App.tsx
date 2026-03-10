@@ -8,6 +8,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import Sidebar from './components/Sidebar'
+import Header from './components/Header'
 
 type Role = 'Nurse Desk' | 'Patient Portal' | 'Admin Panel'
 type BookingStatus = 'pending' | 'approved' | 'rejected'
@@ -77,8 +79,6 @@ const bookingsSeed: Booking[] = [
     telegramSent: false,
   },
 ]
-
-const roles: Role[] = ['Nurse Desk', 'Patient Portal', 'Admin Panel']
 
 const formatMoney = (value: number): string =>
   new Intl.NumberFormat('uz-UZ').format(value) + ' so\'m'
@@ -185,282 +185,259 @@ const App = () => {
     ])
   }
 
+  const totalPayment = formatMoney(
+    bookings.filter((booking) => booking.status === 'approved').reduce((sum, item) => sum + item.amount, 0),
+  )
+
   return (
-    <main
+    <div
       onMouseMove={(event) => setCursor({ x: event.clientX, y: event.clientY })}
-      className="min-h-screen overflow-x-hidden bg-slate-950 text-slate-100"
+      className="flex h-screen overflow-hidden bg-slate-950 text-slate-100"
     >
+      {/* Cursor glow */}
       <div
-        className="pointer-events-none fixed h-48 w-48 rounded-full bg-fuchsia-500/30 blur-3xl transition-transform duration-200"
+        className="pointer-events-none fixed h-48 w-48 rounded-full bg-fuchsia-500/30 blur-3xl transition-transform duration-200 z-0"
         style={{ transform: `translate(${cursor.x - 96}px, ${cursor.y - 96}px)` }}
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-cyan-400/20 via-slate-900/70 to-fuchsia-500/20 p-6 shadow-2xl backdrop-blur-xl">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-4xl">AqilliMed Hospital Platform</h1>
-          <p className="mt-2 max-w-3xl text-sm text-slate-300 sm:text-base">
-            Hamshiralar uchun tez registratsiya, bemorlar uchun online navbat va to‘lov, admin uchun to‘liq nazorat va
-            statistika.
-          </p>
+      {/* Sidebar */}
+      <Sidebar activeRole={activeRole} onRoleChange={setActiveRole} />
 
-          <div className="mt-5 flex flex-wrap gap-3">
-            {roles.map((role) => (
-              <button
-                key={role}
-                type="button"
-                onClick={() => setActiveRole(role)}
-                className={`rounded-xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300 ${
-                  activeRole === role
-                    ? 'bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/50'
-                    : 'bg-white/10 text-slate-100 hover:bg-white/20'
-                }`}
-              >
-                {role}
-              </button>
-            ))}
-          </div>
-        </section>
+      {/* Right column: header + main */}
+      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
+        {/* Header */}
+        <Header
+          activeRole={activeRole}
+          stats={{
+            patients: patients.length,
+            doctors: doctors.length,
+            availableSlots,
+            totalPayment,
+          }}
+        />
 
-        <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="card-modern">
-            <p className="metric-title">Jami bemorlar</p>
-            <p className="metric-value">{patients.length}</p>
-          </div>
-          <div className="card-modern">
-            <p className="metric-title">Faol doktorlar</p>
-            <p className="metric-value">{doctors.length}</p>
-          </div>
-          <div className="card-modern">
-            <p className="metric-title">Mavjud joylar</p>
-            <p className="metric-value">{availableSlots}</p>
-          </div>
-          <div className="card-modern">
-            <p className="metric-title">To‘lovlar</p>
-            <p className="metric-value">
-              {formatMoney(bookings.filter((booking) => booking.status === 'approved').reduce((sum, item) => sum + item.amount, 0))}
-            </p>
-          </div>
-        </section>
-
-        {activeRole === 'Nurse Desk' && (
-          <section className="mt-6 grid gap-6 lg:grid-cols-2">
-            <article className="card-panel">
-              <h2 className="panel-title">Kompyuter registratsiyasi</h2>
-              <div className="mt-4 space-y-3">
-                <input
-                  className="field-modern"
-                  placeholder="Bemor F.I.O"
-                  value={nurseForm.fullName}
-                  onChange={(event) => setNurseForm((prev) => ({ ...prev, fullName: event.target.value }))}
-                />
-                <input
-                  className="field-modern"
-                  placeholder="Telefon"
-                  value={nurseForm.phone}
-                  onChange={(event) => setNurseForm((prev) => ({ ...prev, phone: event.target.value }))}
-                />
-                <button type="button" onClick={addPatientFromNurse} className="btn-primary w-full">
-                  Registratsiya qilish
-                </button>
-              </div>
-            </article>
-
-            <article className="card-panel">
-              <h2 className="panel-title">So‘nggi bemorlar</h2>
-              <div className="mt-4 space-y-2">
-                {patients.slice(0, 6).map((patient) => (
-                  <div key={patient.id} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                    <p className="font-medium">{patient.fullName}</p>
-                    <p className="text-xs text-slate-400">{patient.phone}</p>
-                  </div>
-                ))}
-              </div>
-            </article>
-          </section>
-        )}
-
-        {activeRole === 'Patient Portal' && (
-          <section className="mt-6 grid gap-6 lg:grid-cols-2">
-            <article className="card-panel">
-              <h2 className="panel-title">Qabulga online band qilish</h2>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <input
-                  className="field-modern sm:col-span-2"
-                  placeholder="Bemor ismi"
-                  value={bookingForm.patientName}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, patientName: event.target.value }))}
-                />
-                <select
-                  className="field-modern"
-                  value={bookingForm.doctorId}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, doctorId: Number(event.target.value) }))}
-                >
-                  {doctors.map((doctor) => (
-                    <option key={doctor.id} value={doctor.id}>
-                      {doctor.fullName} ({doctor.specialty})
-                    </option>
-                  ))}
-                </select>
-                <input
-                  className="field-modern"
-                  type="date"
-                  value={bookingForm.date}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, date: event.target.value }))}
-                />
-                <input
-                  className="field-modern"
-                  type="time"
-                  value={bookingForm.time}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, time: event.target.value }))}
-                />
-                <input
-                  className="field-modern"
-                  placeholder="To‘lov summasi"
-                  type="number"
-                  value={bookingForm.amount}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, amount: Number(event.target.value) }))}
-                />
-                <input
-                  className="field-modern sm:col-span-2"
-                  placeholder="Check fayl nomi (masalan: check.jpg)"
-                  value={bookingForm.receiptName}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, receiptName: event.target.value }))}
-                />
-              </div>
-              <button type="button" onClick={createBooking} className="btn-primary mt-4 w-full">
-                To‘lov + navbat band qilish
-              </button>
-              <p className="mt-2 text-xs text-slate-400">
-                Rasm formatida check kiritilsa Telegram botga yuborilgan deb belgilanadi.
-              </p>
-            </article>
-
-            <article className="card-panel">
-              <h2 className="panel-title">Band qilingan qabul ro‘yxati</h2>
-              <div className="mt-4 space-y-2">
-                {bookings.map((booking) => {
-                  const doctor = doctors.find((item) => item.id === booking.doctorId)
-                  return (
-                    <div key={booking.id} className="rounded-xl border border-white/10 bg-white/5 p-3">
-                      <p className="font-medium">{booking.patientName}</p>
-                      <p className="text-xs text-slate-300">{doctor?.fullName}</p>
-                      <p className="text-xs text-slate-400">
-                        {booking.date} {booking.time} • {formatMoney(booking.amount)}
-                      </p>
-                      <span
-                        className={`mt-2 inline-flex rounded-lg px-2 py-1 text-xs font-semibold ${
-                          booking.status === 'approved'
-                            ? 'bg-emerald-500/20 text-emerald-300'
-                            : booking.status === 'rejected'
-                              ? 'bg-rose-500/20 text-rose-300'
-                              : 'bg-amber-500/20 text-amber-300'
-                        }`}
-                      >
-                        {booking.status}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-            </article>
-          </section>
-        )}
-
-        {activeRole === 'Admin Panel' && (
-          <section className="mt-6 space-y-6">
-            <div className="grid gap-6 lg:grid-cols-2">
+        {/* Main content */}
+        <main className="relative flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
+          {activeRole === 'Nurse Desk' && (
+            <section className="grid gap-6 lg:grid-cols-2">
               <article className="card-panel">
-                <div className="flex items-center justify-between">
-                  <h2 className="panel-title">Doktorlar nazorati</h2>
-                  <button type="button" onClick={addDoctor} className="btn-secondary">
-                    + Doktor qo‘shish
+                <h2 className="panel-title">Kompyuter registratsiyasi</h2>
+                <div className="mt-4 space-y-3">
+                  <input
+                    className="field-modern"
+                    placeholder="Bemor F.I.O"
+                    value={nurseForm.fullName}
+                    onChange={(event) => setNurseForm((prev) => ({ ...prev, fullName: event.target.value }))}
+                  />
+                  <input
+                    className="field-modern"
+                    placeholder="Telefon"
+                    value={nurseForm.phone}
+                    onChange={(event) => setNurseForm((prev) => ({ ...prev, phone: event.target.value }))}
+                  />
+                  <button type="button" onClick={addPatientFromNurse} className="btn-primary w-full">
+                    Registratsiya qilish
                   </button>
                 </div>
+              </article>
+
+              <article className="card-panel">
+                <h2 className="panel-title">So'nggi bemorlar</h2>
                 <div className="mt-4 space-y-2">
-                  {doctors.map((doctor) => (
-                    <div key={doctor.id} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                      <p className="font-medium">{doctor.fullName}</p>
-                      <p className="text-xs text-slate-400">
-                        {doctor.specialty} • So‘rovlar: {doctor.queueCount}
-                      </p>
+                  {patients.slice(0, 6).map((patient) => (
+                    <div key={patient.id} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <p className="font-medium">{patient.fullName}</p>
+                      <p className="text-xs text-slate-400">{patient.phone}</p>
                     </div>
                   ))}
+                </div>
+              </article>
+            </section>
+          )}
+
+          {activeRole === 'Patient Portal' && (
+            <section className="grid gap-6 lg:grid-cols-2">
+              <article className="card-panel">
+                <h2 className="panel-title">Qabulga online band qilish</h2>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <input
+                    className="field-modern sm:col-span-2"
+                    placeholder="Bemor ismi"
+                    value={bookingForm.patientName}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, patientName: event.target.value }))}
+                  />
+                  <select
+                    className="field-modern"
+                    value={bookingForm.doctorId}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, doctorId: Number(event.target.value) }))}
+                  >
+                    {doctors.map((doctor) => (
+                      <option key={doctor.id} value={doctor.id}>
+                        {doctor.fullName} ({doctor.specialty})
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    className="field-modern"
+                    type="date"
+                    value={bookingForm.date}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, date: event.target.value }))}
+                  />
+                  <input
+                    className="field-modern"
+                    type="time"
+                    value={bookingForm.time}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, time: event.target.value }))}
+                  />
+                  <input
+                    className="field-modern"
+                    placeholder="To'lov summasi"
+                    type="number"
+                    value={bookingForm.amount}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, amount: Number(event.target.value) }))}
+                  />
+                  <input
+                    className="field-modern sm:col-span-2"
+                    placeholder="Check fayl nomi (masalan: check.jpg)"
+                    value={bookingForm.receiptName}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, receiptName: event.target.value }))}
+                  />
+                </div>
+                <button type="button" onClick={createBooking} className="btn-primary mt-4 w-full">
+                  To'lov + navbat band qilish
+                </button>
+                <p className="mt-2 text-xs text-slate-400">
+                  Rasm formatida check kiritilsa Telegram botga yuborilgan deb belgilanadi.
+                </p>
+              </article>
+
+              <article className="card-panel">
+                <h2 className="panel-title">Band qilingan qabul ro'yxati</h2>
+                <div className="mt-4 space-y-2">
+                  {bookings.map((booking) => {
+                    const doctor = doctors.find((item) => item.id === booking.doctorId)
+                    return (
+                      <div key={booking.id} className="rounded-xl border border-white/10 bg-white/5 p-3">
+                        <p className="font-medium">{booking.patientName}</p>
+                        <p className="text-xs text-slate-300">{doctor?.fullName}</p>
+                        <p className="text-xs text-slate-400">
+                          {booking.date} {booking.time} • {formatMoney(booking.amount)}
+                        </p>
+                        <span
+                          className={`mt-2 inline-flex rounded-lg px-2 py-1 text-xs font-semibold ${
+                            booking.status === 'approved'
+                              ? 'bg-emerald-500/20 text-emerald-300'
+                              : booking.status === 'rejected'
+                                ? 'bg-rose-500/20 text-rose-300'
+                                : 'bg-amber-500/20 text-amber-300'
+                          }`}
+                        >
+                          {booking.status}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </article>
+            </section>
+          )}
+
+          {activeRole === 'Admin Panel' && (
+            <section className="space-y-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                <article className="card-panel">
+                  <div className="flex items-center justify-between">
+                    <h2 className="panel-title">Doktorlar nazorati</h2>
+                    <button type="button" onClick={addDoctor} className="btn-secondary">
+                      + Doktor qo'shish
+                    </button>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    {doctors.map((doctor) => (
+                      <div key={doctor.id} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                        <p className="font-medium">{doctor.fullName}</p>
+                        <p className="text-xs text-slate-400">
+                          {doctor.specialty} • So'rovlar: {doctor.queueCount}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+
+                <article className="card-panel">
+                  <h2 className="panel-title">Bemor profili</h2>
+                  <select
+                    className="field-modern mt-4"
+                    value={selectedPatient.id}
+                    onChange={(event) => setSelectedPatientId(Number(event.target.value))}
+                  >
+                    {patients.map((patient) => (
+                      <option key={patient.id} value={patient.id}>
+                        {patient.fullName}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-lg font-semibold">{selectedPatient.fullName}</p>
+                    <p className="text-sm text-slate-300">{selectedPatient.phone}</p>
+                    <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                      <div className="rounded-xl bg-slate-900/60 p-3">
+                        <p className="text-slate-400">Kasalxonada yotgan</p>
+                        <p className="font-semibold">{selectedPatient.totalStayDays} kun</p>
+                      </div>
+                      <div className="rounded-xl bg-slate-900/60 p-3">
+                        <p className="text-slate-400">Jami to'lov</p>
+                        <p className="font-semibold">{formatMoney(selectedPatient.totalPaid)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              <article className="card-panel">
+                <h2 className="panel-title">Doktorga yozilish statistikasi</h2>
+                <div className="mt-4 h-72 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={statsData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                      <XAxis dataKey="name" stroke="#94a3b8" />
+                      <YAxis stroke="#94a3b8" />
+                      <Tooltip />
+                      <Bar dataKey="requests" fill="#22d3ee" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </article>
 
               <article className="card-panel">
-                <h2 className="panel-title">Bemor profili</h2>
-                <select
-                  className="field-modern mt-4"
-                  value={selectedPatient.id}
-                  onChange={(event) => setSelectedPatientId(Number(event.target.value))}
-                >
-                  {patients.map((patient) => (
-                    <option key={patient.id} value={patient.id}>
-                      {patient.fullName}
-                    </option>
+                <h2 className="panel-title">To'lov checklarini tasdiqlash</h2>
+                <div className="mt-4 space-y-2">
+                  {bookings.map((booking) => (
+                    <div key={booking.id} className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="font-medium">{booking.patientName}</p>
+                        <p className="text-xs text-slate-400">
+                          {booking.receiptName} • Telegram: {booking.telegramSent ? 'yuborilgan' : 'yuborilmagan'}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button type="button" className="btn-success" onClick={() => updateBooking(booking.id, 'approved')}>
+                          Tasdiqlash
+                        </button>
+                        <button type="button" className="btn-danger" onClick={() => updateBooking(booking.id, 'rejected')}>
+                          Bekor qilish
+                        </button>
+                      </div>
+                    </div>
                   ))}
-                </select>
-
-                <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-lg font-semibold">{selectedPatient.fullName}</p>
-                  <p className="text-sm text-slate-300">{selectedPatient.phone}</p>
-                  <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
-                    <div className="rounded-xl bg-slate-900/60 p-3">
-                      <p className="text-slate-400">Kasalxonada yotgan</p>
-                      <p className="font-semibold">{selectedPatient.totalStayDays} kun</p>
-                    </div>
-                    <div className="rounded-xl bg-slate-900/60 p-3">
-                      <p className="text-slate-400">Jami to‘lov</p>
-                      <p className="font-semibold">{formatMoney(selectedPatient.totalPaid)}</p>
-                    </div>
-                  </div>
                 </div>
               </article>
-            </div>
-
-            <article className="card-panel">
-              <h2 className="panel-title">Doktorga yozilish statistikasi</h2>
-              <div className="mt-4 h-72 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={statsData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="name" stroke="#94a3b8" />
-                    <YAxis stroke="#94a3b8" />
-                    <Tooltip />
-                    <Bar dataKey="requests" fill="#22d3ee" radius={[8, 8, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </article>
-
-            <article className="card-panel">
-              <h2 className="panel-title">To‘lov checklarini tasdiqlash</h2>
-              <div className="mt-4 space-y-2">
-                {bookings.map((booking) => (
-                  <div key={booking.id} className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="font-medium">{booking.patientName}</p>
-                      <p className="text-xs text-slate-400">
-                        {booking.receiptName} • Telegram: {booking.telegramSent ? 'yuborilgan' : 'yuborilmagan'}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button type="button" className="btn-success" onClick={() => updateBooking(booking.id, 'approved')}>
-                        Tasdiqlash
-                      </button>
-                      <button type="button" className="btn-danger" onClick={() => updateBooking(booking.id, 'rejected')}>
-                        Bekor qilish
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </article>
-          </section>
-        )}
+            </section>
+          )}
+        </main>
       </div>
-    </main>
+    </div>
   )
 }
 
