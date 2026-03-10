@@ -1,5 +1,27 @@
 import { useMemo, useState } from 'react'
 import {
+  FiActivity,
+  FiBriefcase,
+  FiCalendar,
+  FiCheck,
+  FiCheckCircle,
+  FiClock,
+  FiCreditCard,
+  FiDollarSign,
+  FiFile,
+  FiPhone,
+  FiPlus,
+  FiSend,
+  FiSettings,
+  FiUser,
+  FiUserPlus,
+  FiUsers,
+  FiX,
+  FiXCircle,
+} from 'react-icons/fi'
+import { MdLocalHospital } from 'react-icons/md'
+import { FaTelegramPlane } from 'react-icons/fa'
+import {
   Bar,
   BarChart,
   CartesianGrid,
@@ -79,6 +101,12 @@ const bookingsSeed: Booking[] = [
 ]
 
 const roles: Role[] = ['Nurse Desk', 'Patient Portal', 'Admin Panel']
+
+const roleIcons: Record<Role, React.ReactNode> = {
+  'Nurse Desk': <MdLocalHospital className="shrink-0" />,
+  'Patient Portal': <FiBriefcase className="shrink-0" />,
+  'Admin Panel': <FiSettings className="shrink-0" />,
+}
 
 const formatMoney = (value: number): string =>
   new Intl.NumberFormat('uz-UZ').format(value) + ' so\'m'
@@ -209,12 +237,13 @@ const App = () => {
                 key={role}
                 type="button"
                 onClick={() => setActiveRole(role)}
-                className={`rounded-xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300 ${
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-cyan-300 ${
                   activeRole === role
                     ? 'bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/50'
                     : 'bg-white/10 text-slate-100 hover:bg-white/20'
                 }`}
               >
+                {roleIcons[role]}
                 {role}
               </button>
             ))}
@@ -223,19 +252,31 @@ const App = () => {
 
         <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="card-modern">
-            <p className="metric-title">Jami bemorlar</p>
+            <div className="mb-1 flex items-center gap-2 text-cyan-400">
+              <FiUsers size={20} />
+              <p className="metric-title">Jami bemorlar</p>
+            </div>
             <p className="metric-value">{patients.length}</p>
           </div>
           <div className="card-modern">
-            <p className="metric-title">Faol doktorlar</p>
+            <div className="mb-1 flex items-center gap-2 text-cyan-400">
+              <FiActivity size={20} />
+              <p className="metric-title">Faol doktorlar</p>
+            </div>
             <p className="metric-value">{doctors.length}</p>
           </div>
           <div className="card-modern">
-            <p className="metric-title">Mavjud joylar</p>
+            <div className="mb-1 flex items-center gap-2 text-cyan-400">
+              <FiCalendar size={20} />
+              <p className="metric-title">Mavjud joylar</p>
+            </div>
             <p className="metric-value">{availableSlots}</p>
           </div>
           <div className="card-modern">
-            <p className="metric-title">To‘lovlar</p>
+            <div className="mb-1 flex items-center gap-2 text-cyan-400">
+              <FiDollarSign size={20} />
+              <p className="metric-title">To‘lovlar</p>
+            </div>
             <p className="metric-value">
               {formatMoney(bookings.filter((booking) => booking.status === 'approved').reduce((sum, item) => sum + item.amount, 0))}
             </p>
@@ -247,19 +288,26 @@ const App = () => {
             <article className="card-panel">
               <h2 className="panel-title">Kompyuter registratsiyasi</h2>
               <div className="mt-4 space-y-3">
-                <input
-                  className="field-modern"
-                  placeholder="Bemor F.I.O"
-                  value={nurseForm.fullName}
-                  onChange={(event) => setNurseForm((prev) => ({ ...prev, fullName: event.target.value }))}
-                />
-                <input
-                  className="field-modern"
-                  placeholder="Telefon"
-                  value={nurseForm.phone}
-                  onChange={(event) => setNurseForm((prev) => ({ ...prev, phone: event.target.value }))}
-                />
-                <button type="button" onClick={addPatientFromNurse} className="btn-primary w-full">
+                <label className="relative block">
+                  <FiUser className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    className="field-modern pl-9"
+                    placeholder="Bemor F.I.O"
+                    value={nurseForm.fullName}
+                    onChange={(event) => setNurseForm((prev) => ({ ...prev, fullName: event.target.value }))}
+                  />
+                </label>
+                <label className="relative block">
+                  <FiPhone className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    className="field-modern pl-9"
+                    placeholder="Telefon"
+                    value={nurseForm.phone}
+                    onChange={(event) => setNurseForm((prev) => ({ ...prev, phone: event.target.value }))}
+                  />
+                </label>
+                <button type="button" onClick={addPatientFromNurse} className="btn-primary inline-flex w-full items-center justify-center gap-2">
+                  <FiUserPlus />
                   Registratsiya qilish
                 </button>
               </div>
@@ -269,9 +317,15 @@ const App = () => {
               <h2 className="panel-title">So‘nggi bemorlar</h2>
               <div className="mt-4 space-y-2">
                 {patients.slice(0, 6).map((patient) => (
-                  <div key={patient.id} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                    <p className="font-medium">{patient.fullName}</p>
-                    <p className="text-xs text-slate-400">{patient.phone}</p>
+                  <div key={patient.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                    <FiUser className="shrink-0 text-cyan-400" size={18} />
+                    <div>
+                      <p className="font-medium">{patient.fullName}</p>
+                      <p className="flex items-center gap-1 text-xs text-slate-400">
+                        <FiPhone size={11} />
+                        {patient.phone}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -284,50 +338,69 @@ const App = () => {
             <article className="card-panel">
               <h2 className="panel-title">Qabulga online band qilish</h2>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <input
-                  className="field-modern sm:col-span-2"
-                  placeholder="Bemor ismi"
-                  value={bookingForm.patientName}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, patientName: event.target.value }))}
-                />
-                <select
-                  className="field-modern"
-                  value={bookingForm.doctorId}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, doctorId: Number(event.target.value) }))}
-                >
-                  {doctors.map((doctor) => (
-                    <option key={doctor.id} value={doctor.id}>
-                      {doctor.fullName} ({doctor.specialty})
-                    </option>
-                  ))}
-                </select>
-                <input
-                  className="field-modern"
-                  type="date"
-                  value={bookingForm.date}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, date: event.target.value }))}
-                />
-                <input
-                  className="field-modern"
-                  type="time"
-                  value={bookingForm.time}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, time: event.target.value }))}
-                />
-                <input
-                  className="field-modern"
-                  placeholder="To‘lov summasi"
-                  type="number"
-                  value={bookingForm.amount}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, amount: Number(event.target.value) }))}
-                />
-                <input
-                  className="field-modern sm:col-span-2"
-                  placeholder="Check fayl nomi (masalan: check.jpg)"
-                  value={bookingForm.receiptName}
-                  onChange={(event) => setBookingForm((prev) => ({ ...prev, receiptName: event.target.value }))}
-                />
+                <label className="relative block sm:col-span-2">
+                  <FiUser className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    className="field-modern pl-9"
+                    placeholder="Bemor ismi"
+                    value={bookingForm.patientName}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, patientName: event.target.value }))}
+                  />
+                </label>
+                <label className="relative block">
+                  <FiActivity className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <select
+                    className="field-modern pl-9"
+                    value={bookingForm.doctorId}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, doctorId: Number(event.target.value) }))}
+                  >
+                    {doctors.map((doctor) => (
+                      <option key={doctor.id} value={doctor.id}>
+                        {doctor.fullName} ({doctor.specialty})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="relative block">
+                  <FiCalendar className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    className="field-modern pl-9"
+                    type="date"
+                    value={bookingForm.date}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, date: event.target.value }))}
+                  />
+                </label>
+                <label className="relative block">
+                  <FiClock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    className="field-modern pl-9"
+                    type="time"
+                    value={bookingForm.time}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, time: event.target.value }))}
+                  />
+                </label>
+                <label className="relative block">
+                  <FiCreditCard className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    className="field-modern pl-9"
+                    placeholder="To‘lov summasi"
+                    type="number"
+                    value={bookingForm.amount}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, amount: Number(event.target.value) }))}
+                  />
+                </label>
+                <label className="relative block sm:col-span-2">
+                  <FiFile className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    className="field-modern pl-9 sm:col-span-2"
+                    placeholder="Check fayl nomi (masalan: check.jpg)"
+                    value={bookingForm.receiptName}
+                    onChange={(event) => setBookingForm((prev) => ({ ...prev, receiptName: event.target.value }))}
+                  />
+                </label>
               </div>
-              <button type="button" onClick={createBooking} className="btn-primary mt-4 w-full">
+              <button type="button" onClick={createBooking} className="btn-primary mt-4 inline-flex w-full items-center justify-center gap-2">
+                <FiSend />
                 To‘lov + navbat band qilish
               </button>
               <p className="mt-2 text-xs text-slate-400">
@@ -348,7 +421,7 @@ const App = () => {
                         {booking.date} {booking.time} • {formatMoney(booking.amount)}
                       </p>
                       <span
-                        className={`mt-2 inline-flex rounded-lg px-2 py-1 text-xs font-semibold ${
+                        className={`mt-2 inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold ${
                           booking.status === 'approved'
                             ? 'bg-emerald-500/20 text-emerald-300'
                             : booking.status === 'rejected'
@@ -356,6 +429,13 @@ const App = () => {
                               : 'bg-amber-500/20 text-amber-300'
                         }`}
                       >
+                        {booking.status === 'approved' ? (
+                          <FiCheckCircle size={12} />
+                        ) : booking.status === 'rejected' ? (
+                          <FiXCircle size={12} />
+                        ) : (
+                          <FiClock size={12} />
+                        )}
                         {booking.status}
                       </span>
                     </div>
@@ -372,17 +452,21 @@ const App = () => {
               <article className="card-panel">
                 <div className="flex items-center justify-between">
                   <h2 className="panel-title">Doktorlar nazorati</h2>
-                  <button type="button" onClick={addDoctor} className="btn-secondary">
-                    + Doktor qo‘shish
+                  <button type="button" onClick={addDoctor} className="btn-secondary inline-flex items-center gap-1">
+                    <FiPlus size={15} />
+                    Doktor qo‘shish
                   </button>
                 </div>
                 <div className="mt-4 space-y-2">
                   {doctors.map((doctor) => (
-                    <div key={doctor.id} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                      <p className="font-medium">{doctor.fullName}</p>
-                      <p className="text-xs text-slate-400">
-                        {doctor.specialty} • So‘rovlar: {doctor.queueCount}
-                      </p>
+                    <div key={doctor.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <FiActivity className="shrink-0 text-cyan-400" size={18} />
+                      <div>
+                        <p className="font-medium">{doctor.fullName}</p>
+                        <p className="text-xs text-slate-400">
+                          {doctor.specialty} • So‘rovlar: {doctor.queueCount}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -403,8 +487,14 @@ const App = () => {
                 </select>
 
                 <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-lg font-semibold">{selectedPatient.fullName}</p>
-                  <p className="text-sm text-slate-300">{selectedPatient.phone}</p>
+                  <p className="flex items-center gap-2 text-lg font-semibold">
+                    <FiUser className="text-cyan-400" />
+                    {selectedPatient.fullName}
+                  </p>
+                  <p className="flex items-center gap-1 text-sm text-slate-300">
+                    <FiPhone size={13} className="text-slate-400" />
+                    {selectedPatient.phone}
+                  </p>
                   <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
                     <div className="rounded-xl bg-slate-900/60 p-3">
                       <p className="text-slate-400">Kasalxonada yotgan</p>
@@ -441,15 +531,21 @@ const App = () => {
                   <div key={booking.id} className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 p-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <p className="font-medium">{booking.patientName}</p>
-                      <p className="text-xs text-slate-400">
-                        {booking.receiptName} • Telegram: {booking.telegramSent ? 'yuborilgan' : 'yuborilmagan'}
+                      <p className="flex items-center gap-1 text-xs text-slate-400">
+                        <FiFile size={11} />
+                        {booking.receiptName}
+                        <span className="mx-1">•</span>
+                        <FaTelegramPlane size={11} className={booking.telegramSent ? 'text-cyan-400' : 'text-slate-500'} />
+                        {booking.telegramSent ? 'yuborilgan' : 'yuborilmagan'}
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <button type="button" className="btn-success" onClick={() => updateBooking(booking.id, 'approved')}>
+                      <button type="button" className="btn-success inline-flex items-center gap-1" onClick={() => updateBooking(booking.id, 'approved')}>
+                        <FiCheck size={14} />
                         Tasdiqlash
                       </button>
-                      <button type="button" className="btn-danger" onClick={() => updateBooking(booking.id, 'rejected')}>
+                      <button type="button" className="btn-danger inline-flex items-center gap-1" onClick={() => updateBooking(booking.id, 'rejected')}>
+                        <FiX size={14} />
                         Bekor qilish
                       </button>
                     </div>

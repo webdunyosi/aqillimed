@@ -1,0 +1,131 @@
+import type { Doctor, Patient, Booking } from './types'
+
+export const doctorsSeed: Doctor[] = [
+  {
+    id: 1,
+    fullName: 'Dr. Azizbek Karimov',
+    specialty: 'Kardiolog',
+    queueCount: 44,
+    rating: 4.9,
+    phone: '+998 71 200 01 01',
+    schedule: 'Du-Ju 09:00–17:00',
+  },
+  {
+    id: 2,
+    fullName: 'Dr. Farangiz Ismoilova',
+    specialty: 'Nevrolog',
+    queueCount: 30,
+    rating: 4.7,
+    phone: '+998 71 200 01 02',
+    schedule: 'Du-Sha 10:00–16:00',
+  },
+  {
+    id: 3,
+    fullName: 'Dr. Muhammadali Yoqubov',
+    specialty: 'Terapevt',
+    queueCount: 57,
+    rating: 4.8,
+    phone: '+998 71 200 01 03',
+    schedule: 'Du-Ju 08:00–15:00',
+  },
+  {
+    id: 4,
+    fullName: 'Dr. Dilshoda Sobirova',
+    specialty: 'Pediatr',
+    queueCount: 38,
+    rating: 4.6,
+    phone: '+998 71 200 01 04',
+    schedule: 'Se-Sha 09:00–17:00',
+  },
+]
+
+export const patientsSeed: Patient[] = [
+  {
+    id: 1,
+    fullName: 'Jamshid Normatov',
+    phone: '+998 90 111 22 33',
+    birthDate: '1990-05-14',
+    address: 'Toshkent, Yunusobod tumani',
+    bloodType: 'A(II)+',
+    totalPaid: 1850000,
+    totalStayDays: 6,
+    registeredAt: '2026-01-10',
+    visits: [
+      { id: 1, date: '2026-01-10', doctorId: 3, diagnosis: 'ARVI', paid: 350000, stayDays: 2 },
+      { id: 2, date: '2026-02-18', doctorId: 1, diagnosis: 'Gipertoniya', paid: 900000, stayDays: 4 },
+      { id: 3, date: '2026-03-13', doctorId: 3, diagnosis: 'Tekshiruv', paid: 600000, stayDays: 0 },
+    ],
+  },
+  {
+    id: 2,
+    fullName: 'Nilufar Qodirova',
+    phone: '+998 99 223 44 55',
+    birthDate: '1995-11-22',
+    address: 'Toshkent, Chilonzor tumani',
+    bloodType: 'O(I)+',
+    totalPaid: 720000,
+    totalStayDays: 2,
+    registeredAt: '2026-02-01',
+    visits: [
+      { id: 4, date: '2026-02-01', doctorId: 2, diagnosis: 'Migren', paid: 420000, stayDays: 1 },
+      { id: 5, date: '2026-02-28', doctorId: 2, diagnosis: 'Nazorat', paid: 300000, stayDays: 1 },
+    ],
+  },
+  {
+    id: 3,
+    fullName: 'Sanjar Xolmatov',
+    phone: '+998 93 654 13 22',
+    birthDate: '1985-03-07',
+    address: 'Samarqand shahri',
+    bloodType: 'B(III)-',
+    totalPaid: 2610000,
+    totalStayDays: 10,
+    registeredAt: '2025-11-20',
+    visits: [
+      { id: 6, date: '2025-11-20', doctorId: 4, diagnosis: 'Allergiya', paid: 610000, stayDays: 3 },
+      { id: 7, date: '2026-01-15', doctorId: 3, diagnosis: 'Shamollash', paid: 1000000, stayDays: 4 },
+      { id: 8, date: '2026-02-10', doctorId: 1, diagnosis: 'Yurak tekshiruvi', paid: 1000000, stayDays: 3 },
+    ],
+  },
+]
+
+export const bookingsSeed: Booking[] = [
+  {
+    id: 1,
+    patientName: 'Jamshid Normatov',
+    doctorId: 3,
+    date: '2026-03-13',
+    time: '10:30',
+    amount: 180000,
+    receiptName: 'tolov-check.jpg',
+    status: 'approved',
+    telegramSent: true,
+    createdAt: '2026-03-10',
+  },
+  {
+    id: 2,
+    patientName: 'Sardor Tursunov',
+    doctorId: 1,
+    date: '2026-03-14',
+    time: '12:00',
+    amount: 180000,
+    receiptName: 'receipt.pdf',
+    status: 'pending',
+    telegramSent: false,
+    createdAt: '2026-03-10',
+  },
+  {
+    id: 3,
+    patientName: 'Nilufar Qodirova',
+    doctorId: 2,
+    date: '2026-03-15',
+    time: '09:00',
+    amount: 180000,
+    receiptName: 'check.png',
+    status: 'pending',
+    telegramSent: true,
+    createdAt: '2026-03-10',
+  },
+]
+
+export const TOTAL_SLOTS = 24
