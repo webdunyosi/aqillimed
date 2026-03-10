@@ -1,0 +1,10 @@
+[
+  {
+    "_note": "DEMO ONLY — plaintext passwords must never be used in production",
+    "id": "admin-1",
+    "fullName": "Demo Admin",
+    "username": "demo_admin",
+    "password": "demo123",
+    "role": "admin"
+  }
+]
