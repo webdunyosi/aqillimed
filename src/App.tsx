@@ -10,6 +10,8 @@ import DoctorDashboard from './pages/DoctorDashboard'
 import DoctorAppointments from './pages/DoctorAppointments'
 import DoctorPatients from './pages/DoctorPatients'
 import UserDashboard from './pages/UserDashboard'
+import UserAppointments from './pages/UserAppointments'
+import MedicalHistory from './pages/MedicalHistory'
 import ProtectedRoute from './components/ProtectedRoute'
 import { getCurrentUser } from './services/auth'
 
@@ -89,6 +91,26 @@ const App = () => (
           <ProtectedRoute allowedRoles={['user']}>
             <PatientLayout>
               <UserDashboard />
+            </PatientLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/patient/appointments"
+        element={
+          <ProtectedRoute allowedRoles={['user']}>
+            <PatientLayout>
+              <UserAppointments />
+            </PatientLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/patient/history"
+        element={
+          <ProtectedRoute allowedRoles={['user']}>
+            <PatientLayout>
+              <MedicalHistory />
             </PatientLayout>
           </ProtectedRoute>
         }
