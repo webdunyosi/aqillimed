@@ -7,6 +7,8 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import AdminDashboard from './pages/AdminDashboard'
 import DoctorDashboard from './pages/DoctorDashboard'
+import DoctorAppointments from './pages/DoctorAppointments'
+import DoctorPatients from './pages/DoctorPatients'
 import UserDashboard from './pages/UserDashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import { getCurrentUser } from './services/auth'
@@ -55,6 +57,26 @@ const App = () => (
           <ProtectedRoute allowedRoles={['doctor']}>
             <DoctorLayout>
               <DoctorDashboard />
+            </DoctorLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/doctor/appointments"
+        element={
+          <ProtectedRoute allowedRoles={['doctor']}>
+            <DoctorLayout>
+              <DoctorAppointments />
+            </DoctorLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/doctor/patients"
+        element={
+          <ProtectedRoute allowedRoles={['doctor']}>
+            <DoctorLayout>
+              <DoctorPatients />
             </DoctorLayout>
           </ProtectedRoute>
         }
